@@ -13,14 +13,14 @@ const SECRET_KEY = process.env.SECRET_KEY;
 const signCookies = require('../utils/signCookies.js');
 
 // MIDDLEWARES TO GUARD ROUTES 
-const { isLoggedIn } = require('../middlewares/route-guard.js');
+const { isLoggedIn, isLoggedOut } = require('../middlewares/route-guard.js');
 // SIGN UP ROUTE
 
-router.get('/signup', (req, res) => {
+router.get('/signup', isLoggedOut, (req, res) => {
     res.render('auth/signup.hbs')
 });
 
-router.post('/signup', (req, res) => {
+router.post('/signup', isLoggedOut, (req, res) => {
 
     const { name, email, password } = req.body
 
@@ -69,16 +69,13 @@ router.post('/signup', (req, res) => {
         })
         .catch((err) => console.log('Error retrieving user:', err));
 
-
-
-
 })
 
-router.get('/login', (req, res) => {
+router.get('/login', isLoggedOut, (req, res) => {
     res.render('auth/login.hbs');
 })
 
-router.post('/login', (req, res) => {
+router.post('/login', isLoggedOut, (req, res) => {
 
     const { email, password } = req.body;
 
@@ -88,7 +85,7 @@ router.post('/login', (req, res) => {
         res.status(400).render('auth/login.hbs', { errorMessage: 'Provide email and password.' });
         return;
     }
-    // Check if user exists
+    // CHECK IF USER EXISTS
     User.findOne({ email })
         .then((user) => {
             console.log('user:', user)
@@ -112,11 +109,9 @@ router.post('/login', (req, res) => {
 })
 
 router.get('/userProfile', isLoggedIn, (req, res) => {
-    console.log(req)
     const id = req.signedCookies.session;
     const { theme } = req.cookies;
 
-    console.log(theme)
     User.findById(id)
         .then((user) => {
             const { name } = user;
@@ -125,7 +120,7 @@ router.get('/userProfile', isLoggedIn, (req, res) => {
         .catch((err) => console.log('Error retrieving user: ', err));
 
 })
-router.post('/logout', (req, res) => {
+router.post('/logout', isLoggedIn, (req, res) => {
     res.clearCookie('session', { httpOnly: true });
     res.clearCookie('theme')
     res.clearCookie('role')

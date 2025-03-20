@@ -6,7 +6,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 require('./db/index.js')(MONGODB_URI);
 
-
 const app = express();
 
 // SET UP MIDDLEWARES
@@ -23,8 +22,6 @@ app.use('/', indexRouter);
 
 const authRouter = require('./routes/auth.routes.js');
 app.use('/', authRouter);
-
-
 
 
 // ERROR HANDLING MIDDLEWARE

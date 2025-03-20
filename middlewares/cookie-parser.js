@@ -35,7 +35,6 @@ function cookieParser(secretKey = null) {
                     req.cookies[key] = cookies[key]
                 }
 
-
             }
             else if (key === 'Path' || key === 'HttpOnly' || key === 'Max-Age' || key === 'Secure' || key === 'SameSite' || key === 'Domain') {
                 continue;

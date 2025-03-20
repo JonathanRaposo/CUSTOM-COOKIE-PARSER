@@ -9,8 +9,8 @@ function isLoggedIn(req, res, next) {
 }
 function isLoggedOut(req, res, next) {
     if (req.signedCookies.session) {
-        return res.redirect('/userProfile');
+        return res.redirect('/');
     }
     next();
 }
-module.exports = { isLoggedIn };
+module.exports = { isLoggedIn, isLoggedOut };
