@@ -1,0 +1,2 @@
+
+This is an express app with a custom cookie parser middleware. it mimics what the actual cookie-parser module does. it parses the cookie from the request. If it's a signed cookie, it verifies it and either attaches it to the signedCookies object or it will add the values to the req.cookies object.
