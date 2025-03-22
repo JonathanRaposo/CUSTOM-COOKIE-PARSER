@@ -1,57 +1,55 @@
 
-
 const crypto = require('crypto');
 
-
-function cookieParser(secretKey = null) {
+function cookieParser(secret = undefined) {
     return (req, res, next) => {
 
+        if (typeof secret === 'object') {
+            throw new TypeError('Secret string must be provided but got an object.')
+        }
+        req.secret = secret;
         req.cookies = {};
         req.signedCookies = {};
 
         if (!req.headers.cookie) {
-            next();
-            return;
+            return next();
         }
-        const cookies = {}
+
+        const cookies = {}; 
 
         const cookiePairs = req.headers.cookie.split('; ');
-
-        for (let cookie of cookiePairs) {
-            const [key, value] = cookie.split('=');
+        for (const cookie of cookiePairs) {
+            const [key, value] = cookie.trim().split('=');
             cookies[key] = decodeURIComponent(value);
         }
 
-        for (let key in cookies) {
+        for (const [key, value] of Object.entries(cookies)) {
+            if (typeof secret === 'string' && value.startsWith('s:')) {
+                const [payload, hash] = value.slice(2).split('.');
 
-            if (typeof secretKey === 'string' && cookies[key].includes('s:')) {
+                const expectedSignature = crypto
+                    .createHmac('sha256', secret)
+                    .update(payload)
+                    .digest('base64url');
 
-                const [payload, hash] = cookies[key].slice(2).split('.');
-                const expectedSignature = crypto.createHmac('sha256', secretKey).update(payload).digest('base64url');
-
-                if (expectedSignature === hash) {
+                if (hash === expectedSignature) {
                     req.signedCookies[key] = payload;
-                } else {
-                    req.cookies[key] = cookies[key]
                 }
-
+                else {
+                    req.cookies[key] = value;
+                }
             }
             else if (key === 'Path' || key === 'HttpOnly' || key === 'Max-Age' || key === 'Secure' || key === 'SameSite' || key === 'Domain') {
                 continue;
+
             } else {
-                req.cookies[key] = cookies[key];
+                req.cookies[key] = value;
             }
 
-        }
+        };
         next();
+
     }
-
 }
+
 module.exports = cookieParser;
-
-
-
-
-
-
-// console.log(request)

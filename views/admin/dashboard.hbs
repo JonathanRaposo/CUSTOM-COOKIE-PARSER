@@ -1,12 +1,10 @@
-
-
 {{#if user}}
-  <div id="profile-wrapper" class="{{user.theme}}">
+  <div id="profile-wrapper">
 
      <h3>Welcome back {{user.name}}!</h3>
-     <p>This is your profile page</p>
+     <p>This is your admin profile page.</p>
       <button id="refresh-page-btn">
-         <a href="/user/profile">Reload page</a>
+         <a href="/admin/dashboard">Reload page</a>
       </button>
   {{else}}
     <p>Not logged in yet.</p>

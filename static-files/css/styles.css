@@ -4,7 +4,7 @@ body{
     font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
 
 }
-button {
+button, select {
     font: inherit;
 }
 h1,h2,h3{
@@ -40,6 +40,24 @@ ul li{
     display: inline-block;
     padding: 6px;
 }
+nav ul #admin-link{
+    background-color: #4a034a;
+    border: 1px solid #4a034a;
+    border-radius: 3px;
+    transition: background-color .3s;
+}
+nav ul #admin-link:hover{
+    background-color: #e4e0e0;
+   
+}
+nav ul #admin-link a{
+    color: #e4e0e0;
+    transition: .3s ease color;
+}
+nav ul #admin-link a:hover{
+    color: #000
+    
+}
 
 /* background-image styles */
 #bgImg{
@@ -66,6 +84,13 @@ ul li{
     text-align: center;
     width:100%;
 }
+#signup-form #role-label{
+    display: inline
+}
+#signup-form select{
+    border: none;
+    outline: none;
+}
 #login-form input,
 #login-form button,
 #signup-form input,
@@ -90,6 +115,8 @@ ul li{
     text-transform: uppercase;
     transition: 0.3s ease background;
     width: 100%;
+    margin-top: 20px;
+
     
 }
 #login-form button:hover{
@@ -117,11 +144,11 @@ ul li{
 #profile-wrapper.dark{
     width: 100%;
     height: 100vh;
-    background-color: #323131;
+    background-color: #fde9d1
 }
 .dark p,
 .dark h3{
-    color:#fff;
+    color:#000;
     margin:0;
 }
 

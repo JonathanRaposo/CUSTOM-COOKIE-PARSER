@@ -6,14 +6,14 @@ const User = require('../models/User.model.js');
 
 const bcrypt = require('bcryptjs');
 
-const SECRET_KEY = process.env.SECRET_KEY;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 
 // HELPER TO SIGN COOKIES
 const signCookies = require('../utils/signCookies.js');
 
 // MIDDLEWARES TO GUARD ROUTES 
-const { isLoggedIn, isLoggedOut } = require('../middlewares/route-guard.js');
+const { isLoggedIn, isLoggedOut, isAdmin } = require('../middlewares/route-guard.js');
 // SIGN UP ROUTE
 
 router.get('/signup', isLoggedOut, (req, res) => {
@@ -21,13 +21,13 @@ router.get('/signup', isLoggedOut, (req, res) => {
 });
 
 router.post('/signup', isLoggedOut, (req, res) => {
-
-    const { name, email, password } = req.body
+    console.log(req.body)
+    const { name, email, password, isAdmin } = req.body
 
     // MAKE SURE USER FILLS ALL FIELDS
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !isAdmin) {
 
-        res.status(400).render('auth/signup.hbs', { errorMessage: 'Provide name, email and password' });
+        res.status(400).render('auth/signup.hbs', { errorMessage: 'Provide name, email,password and role' });
         return;
     }
     // MAKE SURE EMAIL HAS VALID FORMAT
@@ -56,9 +56,10 @@ router.post('/signup', isLoggedOut, (req, res) => {
                 res.status(400).render('auth/signup.hbs', { errorMessage: 'This email is already registered.' })
                 return;
             }
+            const role = isAdmin === 'true' ? true : false;
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(password, salt);
-            return User.create({ name, email, password: hash });
+            return User.create({ name, email, password: hash, isAdmin: role });
         })
         .then((newUser) => {
             console.log('New user:', newUser)
@@ -88,18 +89,16 @@ router.post('/login', isLoggedOut, (req, res) => {
     // CHECK IF USER EXISTS
     User.findOne({ email })
         .then((user) => {
-            console.log('user:', user)
             if (!user) {
                 res.status(401).render('auth/login.hbs', { errorMessage: 'User not found' });
                 return;
             } else if (bcrypt.compareSync(password, user.password)) {
+
                 const id = user._id.toString();
-                const signedValue = signCookies(id, SECRET_KEY);
-                console.log('signature:', signedValue);
-                res.cookie('session', `${signedValue}`, { httpOnly: true, maxAge: 3600000 });
-                res.cookie('theme', 'dark', { maxAge: 3600000 });
-                res.cookie('role', 'admin', { maxAge: 360000 });
-                res.redirect('/userProfile');
+                const signedValue = signCookies(id, SESSION_SECRET);
+                // res.cookie('session', `${signedValue}`, { httpOnly: true });
+                res.setHeader('Set-Cookie', `session=${signedValue}; HttpOnly; Path=/`)
+                res.redirect('/user/profile');
 
             } else {
                 res.status(400).render('auth/login.hbs', { errorMessage: 'Incorrect password' });
@@ -108,23 +107,19 @@ router.post('/login', isLoggedOut, (req, res) => {
         .catch((err) => console.log("Error loggin in:", err));
 })
 
-router.get('/userProfile', isLoggedIn, (req, res) => {
-    const id = req.signedCookies.session;
-    const { theme } = req.cookies;
-
-    User.findById(id)
-        .then((user) => {
-            const { name } = user;
-            res.status(200).render('users/user-profile.hbs', { user: { name, theme } })
-        })
-        .catch((err) => console.log('Error retrieving user: ', err));
+router.get('/user/profile', isLoggedIn, (req, res) => {
+    res.status(200).render('users/user-profile.hbs', { user: req.currentUser });
 
 })
-router.post('/logout', isLoggedIn, (req, res) => {
+router.get('/admin/dashboard', isLoggedIn, isAdmin, (req, res) => {
+    console.log('current user:', req.currentUser)
+    res.status(200).render('admin/dashboard.hbs', { user: req.currentUser });
+
+})
+router.post('/logout', (req, res) => {
     res.clearCookie('session', { httpOnly: true });
-    res.clearCookie('theme')
-    res.clearCookie('role')
     res.redirect('/login')
+
 
 })
 module.exports = router;

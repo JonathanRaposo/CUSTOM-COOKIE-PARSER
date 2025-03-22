@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const MONGODB_URI = process.env.MONGODB_URI;
-const SECRET_KEY = process.env.SECRET_KEY;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 // CONNECT TO DATABASE
 
 require('./db/index.js')(MONGODB_URI);
@@ -13,16 +13,16 @@ require('./config/index.js')(app);
 
 // CUSTOM COOKIE PARSER
 const cookieParser = require('./middlewares/cookie-parser.js')
-app.use(cookieParser(SECRET_KEY))
+app.use(cookieParser(SESSION_SECRET))
 
 // ROUTES HERE
 
 const indexRouter = require('./routes/index.js');
 app.use('/', indexRouter);
 
+
 const authRouter = require('./routes/auth.routes.js');
 app.use('/', authRouter);
-
 
 // ERROR HANDLING MIDDLEWARE
 app.use((req, res, next) => {
