@@ -27,7 +27,7 @@ router.post('/signup', isLoggedOut, (req, res) => {
     // MAKE SURE USER FILLS ALL FIELDS
     if (!name || !email || !password || !isAdmin) {
 
-        res.status(400).render('auth/signup.hbs', { errorMessage: 'Provide name, email,password and role' });
+        res.status(400).render('auth/signup.hbs', { errorMessage: 'Provide name, email,password and isAdminString' });
         return;
     }
     // MAKE SURE EMAIL HAS VALID FORMAT
@@ -56,10 +56,10 @@ router.post('/signup', isLoggedOut, (req, res) => {
                 res.status(400).render('auth/signup.hbs', { errorMessage: 'This email is already registered.' })
                 return;
             }
-            const role = isAdmin === 'true' ? true : false;
+            const isAdminString = isAdmin === 'true' ? true : false;
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(password, salt);
-            return User.create({ name, email, password: hash, isAdmin: role });
+            return User.create({ name, email, password: hash, isAdmin: isAdminString });
         })
         .then((newUser) => {
             console.log('New user:', newUser)
