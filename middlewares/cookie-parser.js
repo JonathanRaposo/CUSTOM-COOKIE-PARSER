@@ -40,10 +40,7 @@ function cookieParser(secret = undefined) {
                     req.cookies[key] = value;
                 }
             }
-            // else if (key === 'Path' || key === 'HttpOnly' || key === 'Max-Age' || key === 'Secure' || key === 'SameSite' || key === 'Domain') {
-            //     continue;
-
-            // } 
+        
             else {
                 req.cookies[key] = value;
             }
