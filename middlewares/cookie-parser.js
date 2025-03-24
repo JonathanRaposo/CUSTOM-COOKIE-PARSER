@@ -24,7 +24,7 @@ function cookieParser(secret = undefined) {
         }
 
         for (const [key, value] of Object.entries(cookies)) {
-            if (typeof secret === 'string' && value.startsWith('s:')) {
+            if (typeof secret === 'string' && value.includes('s:')) {
                 const [payload, hash] = value.slice(2).split('.');
 
                 const expectedSignature = crypto
