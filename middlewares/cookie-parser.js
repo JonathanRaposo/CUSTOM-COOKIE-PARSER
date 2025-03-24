@@ -15,7 +15,7 @@ function cookieParser(secret = undefined) {
             return next();
         }
 
-        const cookies = {}; 
+        const cookies = {};
 
         const cookiePairs = req.headers.cookie.split('; ');
         for (const cookie of cookiePairs) {
@@ -23,7 +23,8 @@ function cookieParser(secret = undefined) {
             cookies[key] = decodeURIComponent(value);
         }
 
-        for (const [key, value] of Object.entries(cookies)) {
+        for (const pairs of Object.entries(cookies)) {
+            const [key, value] = pairs;
             if (typeof secret === 'string' && value.includes('s:')) {
                 const [payload, hash] = value.slice(2).split('.');
 
@@ -39,10 +40,11 @@ function cookieParser(secret = undefined) {
                     req.cookies[key] = value;
                 }
             }
-            else if (key === 'Path' || key === 'HttpOnly' || key === 'Max-Age' || key === 'Secure' || key === 'SameSite' || key === 'Domain') {
-                continue;
+            // else if (key === 'Path' || key === 'HttpOnly' || key === 'Max-Age' || key === 'Secure' || key === 'SameSite' || key === 'Domain') {
+            //     continue;
 
-            } else {
+            // } 
+            else {
                 req.cookies[key] = value;
             }
 

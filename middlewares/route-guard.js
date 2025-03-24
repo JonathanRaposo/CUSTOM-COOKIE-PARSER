@@ -5,6 +5,7 @@ const User = require('../models/User.model.js');
 require('../db/index.js')(process.env.MONGODB_URI)
 
 function isLoggedIn(req, res, next) {
+    console.log(req)
     if (!req.signedCookies.session) {
         return res.redirect('/login');
 
@@ -21,6 +22,7 @@ function isLoggedIn(req, res, next) {
         .catch((err) => console.log('Error retrieving user:', err))
 
 }
+
 function isLoggedOut(req, res, next) {
     if (req.signedCookies.session) {
         return res.redirect('/'); // If user is logged in, stop and redirect to home page

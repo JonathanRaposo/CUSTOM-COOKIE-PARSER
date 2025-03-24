@@ -97,7 +97,7 @@ router.post('/login', isLoggedOut, (req, res) => {
                 const id = user._id.toString();
                 const signedValue = signCookies(id, SESSION_SECRET);
                 // res.cookie('session', `${signedValue}`, { httpOnly: true });
-                res.setHeader('Set-Cookie', `session=${signedValue}; HttpOnly; Path=/`)
+                res.setHeader('Set-Cookie', [`session=${signedValue}; HttpOnly; Path=/`, 'theme=dark'])
                 res.redirect('/user/profile');
 
             } else {
@@ -118,6 +118,7 @@ router.get('/admin/dashboard', isLoggedIn, isAdmin, (req, res) => {
 })
 router.post('/logout', (req, res) => {
     res.clearCookie('session', { httpOnly: true });
+    res.clearCookie('theme')
     res.redirect('/login')
 
 
